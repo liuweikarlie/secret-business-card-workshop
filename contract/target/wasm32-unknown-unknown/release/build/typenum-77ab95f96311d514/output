@@ -1,0 +1,3 @@
+cargo:rerun-if-changed=build/main.rs
+cargo:rustc-env=TYPENUM_BUILD_CONSTS=/home/ubuntu/Documents/testing_github/secret-business-card-workshop/contract/target/wasm32-unknown-unknown/release/build/typenum-77ab95f96311d514/out/consts.rs
+cargo:rustc-env=TYPENUM_BUILD_OP=/home/ubuntu/Documents/testing_github/secret-business-card-workshop/contract/target/wasm32-unknown-unknown/release/build/typenum-77ab95f96311d514/out/op.rs

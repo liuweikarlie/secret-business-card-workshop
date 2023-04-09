@@ -2,7 +2,7 @@ import { SecretNetworkClient, Wallet } from "secretjs";
 import * as fs from "fs";
 
 //replace with your wallet seed
-const wallet = new Wallet("your wallet seed goes here");
+const wallet = new Wallet("empty creek remove toy nephew illness person omit drop fluid render drastic sorry rude dilemma announce magic suspect public inspire require jaguar broccoli trigger");
 
 const contract_wasm = fs.readFileSync("../contract.wasm");
 
@@ -13,9 +13,10 @@ const secretjs = new SecretNetworkClient({
   walletAddress: wallet.address,
 });
 
-// console.log(secretjs);
+//console.log(secretjs);
 
 let upload_contract = async () => {
+try{
   let tx = await secretjs.tx.compute.storeCode(
     {
       sender: wallet.address,
@@ -39,20 +40,30 @@ let upload_contract = async () => {
     await secretjs.query.compute.codeHashByCodeId({ code_id: codeId })
   ).code_hash;
   console.log(`Contract hash: ${contractCodeHash}`);
+}
+catch (err){
+
+console.error(err);
+}
+
+
 };
 
-// upload_contract();
-
+//upload_contract();
+let contractCodeHash="10676f247225c87c467c38d584023612943f73bbdd06792232d788b16213c68e";
+let codeId=20664;
+let contractAddress="secret10lul899u2pkzdzjjuf7m5de4ngwqxwrf2g0k6h"
 let instantiate_contract = async () => {
   // Create an instance of the Counter contract, providing a starting count
-  const initMsg = { entropy: "this is my entropy, dude!" };
+  try{
+  const initMsg = { entropy: "this " };
   let tx = await secretjs.tx.compute.instantiateContract(
     {
       code_id: codeId,
       sender: wallet.address,
       code_hash: contractCodeHash,
       init_msg: initMsg,
-      label: "Secret Business Card Demo" + Math.ceil(Math.random() * 10000),
+      label: "Secret Business Card Demo" ,
     },
     {
       gasLimit: 400_000,
@@ -60,16 +71,26 @@ let instantiate_contract = async () => {
   );
 
   //Find the contract_address in the logs
-  const contractAddress = tx.arrayLog.find(
-    (log) => log.type === "message" && log.key === "contract_address"
-  ).value;
+  let arraylog1=tx.arrayLog
+  
 
-  console.log(contractAddress);
+
+  console.log(arraylog1);
+  }
+  catch(err){
+  console.error(err);
+  }
 };
+//instantiate_contract();
 
-// instantiate_contract();
+
+
+
+
+
 
 let createCard = async () => {
+
   const card_creation_tx = await secretjs.tx.compute.executeContract(
     {
       sender: wallet.address,
@@ -91,7 +112,7 @@ let createCard = async () => {
 
   console.log(card_creation_tx);
 };
-// createCard();
+ //createCard();
 
 let createViewingKey = async () => {
   let viewing_key_creation = await secretjs.tx.compute.executeContract(
@@ -114,9 +135,24 @@ let createViewingKey = async () => {
     ).value
   );
 };
-// createViewingKey();
-
+ //createViewingKey();
+let viewing_key="KXHV3PcqLieJW0MMKUfn8J3pYi01YbGmrg7pmYwwdDg=";
 let queryCard = async () => {
-  // your code to go here
+let business_card_query_tx=await secretjs.query.compute.queryContract({
+	contract_address:contractAddress,
+	query:{
+		get_card:{
+			wallet:wallet.address,
+			viewing_key:viewing_key,
+			index:0,
+		},
+		
+	
+	},
+	code_hash:contractCodeHash,
+	
+});
+console.log(business_card_query_tx);
+  
 };
 queryCard();

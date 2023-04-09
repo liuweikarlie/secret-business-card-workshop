@@ -51,11 +51,16 @@ pub fn try_burn_card(
     info: MessageInfo,
     index: u8,
 ) -> StdResult<Response> {
-    // your code to go here
+      let user_exists=USER_CARDS
+        .add_suffix(info.sender.as_bytes())
+        .get(deps.storage,&index);
 
-    //1. first check that the user (and their card) exists
+    match user_exists{
+        Some(_)=>USER_CARDS.add_suffix(info.sender.as_bytes()).remove(deps.storage,&index)?,
+        None=>{}
 
-    //2. Then, if the user exists, remove the card associated with their wallet address at the card's specified index in storage
+
+    }
 
     Ok(Response::default())
 }
