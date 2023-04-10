@@ -165,7 +165,12 @@ let business_card_query_tx=await secretjs.query.compute.queryContract({
 console.log(business_card_query_tx);
   
 };
-queryCard();
+//queryCard();
+
+
+//Get the codeInfo based on codeid
+const codeInfo = await secretjs.query.compute.contractsByCodeId({code_id:"20622"});
+console.log(codeInfo)
 
 // current doubts: viewing keys should be the owner to see the information, other people use the same key should not see the information ? ---- problem solve !
 
