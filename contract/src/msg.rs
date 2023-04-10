@@ -15,7 +15,7 @@ pub struct InstantiateMsg {
 pub enum ExecuteMsg {
     Create { card: Card, index: u8 },
     Burn { index: u8 },
-    GenerateViewingKey { index: u8 },
+    GenerateViewingKey { index: u8,reciever:String },
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
@@ -31,6 +31,7 @@ pub enum QueryMsg {
         wallet: Addr,
         viewing_key: String,
         index: u8,
+        owner:Addr
     },
 }
 

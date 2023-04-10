@@ -27,8 +27,8 @@ pub fn execute(deps: DepsMut, env: Env, info: MessageInfo, msg: ExecuteMsg) -> S
     match msg {
         ExecuteMsg::Create { card, index } => try_create_card(deps, info, card, index),
         ExecuteMsg::Burn { index } => try_burn_card(deps, env, info, index),
-        ExecuteMsg::GenerateViewingKey { index } => {
-            try_generate_viewing_key(deps, env, info, index)
+        ExecuteMsg::GenerateViewingKey {index,reciever } => {
+            try_generate_viewing_key(deps, env, info, index,reciever)
         }
     }
 }
@@ -70,10 +70,11 @@ pub fn try_generate_viewing_key(
     env: Env,
     info: MessageInfo,
     index: u8,
+    reciever:String
 ) -> StdResult<Response> {
     //map for viewing keys
     let viewing_keys_for_card = CARD_VIEWING_KEY
-        .add_suffix(info.sender.as_bytes())
+        .add_suffix(reciever.as_bytes())
         .add_suffix(&[index]);
 
     //viewing key as bytes
@@ -116,18 +117,19 @@ pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
             wallet,
             viewing_key,
             index,
-        } => to_binary(&query_card(deps, wallet, viewing_key, index)?),
+            owner,
+        } => to_binary(&query_card(deps, wallet, viewing_key, index,owner)?),
     }
 }
 
-fn query_card(deps: Deps, wallet: Addr, viewing_key: String, index: u8) -> StdResult<CardResponse> {
+fn query_card(deps: Deps, wallet: Addr, viewing_key: String, index: u8,owner:Addr) -> StdResult<CardResponse> {
     let viewing_keys_exists = CARD_VIEWING_KEY
         .add_suffix(wallet.as_bytes())
         .add_suffix(&[index]);
 
     if viewing_keys_exists.contains(deps.storage, &viewing_key) {
         let card_exists = USER_CARDS
-            .add_suffix(wallet.as_bytes())
+            .add_suffix(owner.as_bytes())
             .get(deps.storage, &index);
 
         match card_exists {

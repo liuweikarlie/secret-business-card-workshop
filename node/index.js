@@ -2,7 +2,8 @@ import { SecretNetworkClient, Wallet } from "secretjs";
 import * as fs from "fs";
 
 //replace with your wallet seed
-const wallet = new Wallet("empty creek remove toy nephew illness person omit drop fluid render drastic sorry rude dilemma announce magic suspect public inspire require jaguar broccoli trigger");
+const wallet = new Wallet("hawk loyal creek exotic stick steel inspire donkey zoo slow index student");
+const wallet1 = new Wallet("empty creek remove toy nephew illness person omit drop fluid render drastic sorry rude dilemma announce magic suspect public inspire require jaguar broccoli trigger");
 
 const contract_wasm = fs.readFileSync("../contract.wasm");
 
@@ -50,12 +51,13 @@ console.error(err);
 };
 
 //upload_contract();
-let contractCodeHash="10676f247225c87c467c38d584023612943f73bbdd06792232d788b16213c68e";
-let codeId=20664;
-let contractAddress="secret10lul899u2pkzdzjjuf7m5de4ngwqxwrf2g0k6h"
+let contractCodeHash="bbc91b6010298e67f9f318a9c65f3a8a25863b60fb7fb5c9d11d9a72876df537";
+let codeId=20689;
+let contractAddress="secret1n5mt3u2n0vf8z4x7x6ztl0qdatyc5p8clnq9sh"
 let instantiate_contract = async () => {
   // Create an instance of the Counter contract, providing a starting count
   try{
+  console.log("initialized");
   const initMsg = { entropy: "this " };
   let tx = await secretjs.tx.compute.instantiateContract(
     {
@@ -63,7 +65,7 @@ let instantiate_contract = async () => {
       sender: wallet.address,
       code_hash: contractCodeHash,
       init_msg: initMsg,
-      label: "Secret Business Card Demo" ,
+      label: "Secret BUsiness card improve Demo V3" ,
     },
     {
       gasLimit: 400_000,
@@ -88,7 +90,6 @@ let instantiate_contract = async () => {
 
 
 
-
 let createCard = async () => {
 
   const card_creation_tx = await secretjs.tx.compute.executeContract(
@@ -98,9 +99,9 @@ let createCard = async () => {
       msg: {
         create: {
           card: {
-            name: "CardMonkey",
-            address: "CodeMonkey Street",
-            phone: "123456789",
+            name: "Crd",
+            address: "Codetredsfet",
+            phone: "12345678953",
           },
           index: 0,
         },
@@ -112,7 +113,7 @@ let createCard = async () => {
 
   console.log(card_creation_tx);
 };
- //createCard();
+//createCard();
 
 let createViewingKey = async () => {
   let viewing_key_creation = await secretjs.tx.compute.executeContract(
@@ -122,6 +123,8 @@ let createViewingKey = async () => {
       msg: {
         generate_viewing_key: {
           index: 0,
+          reciever:wallet1.address
+          
         },
       },
       code_hash: contractCodeHash,
@@ -130,21 +133,28 @@ let createViewingKey = async () => {
   );
 
   console.log(
-    viewing_key_creation.arrayLog.find(
-      (log) => log.type === "wasm" && log.key === "viewing_key"
-    ).value
+    viewing_key_creation.arrayLog
   );
 };
- //createViewingKey();
-let viewing_key="KXHV3PcqLieJW0MMKUfn8J3pYi01YbGmrg7pmYwwdDg=";
+
+
+//createViewingKey();
+
+
+
+
+let viewing_key="dZoik9JALs9gQX4IUydQbwCQPoojy5acjWSLKPZOItI=";
+//let viewing_key="KXHV3PcqLieJW0MMKUfn8J3pYi01YbGmrg7pmYwwdDg=";
+
 let queryCard = async () => {
 let business_card_query_tx=await secretjs.query.compute.queryContract({
 	contract_address:contractAddress,
 	query:{
 		get_card:{
-			wallet:wallet.address,
+			wallet:wallet1.address,
 			viewing_key:viewing_key,
 			index:0,
+			owner:wallet.address
 		},
 		
 	
@@ -156,3 +166,6 @@ console.log(business_card_query_tx);
   
 };
 queryCard();
+
+// current doubts: viewing keys should be the owner to see the information, other people use the same key should not see the information ? ---- problem solve !
+
