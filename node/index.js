@@ -99,11 +99,11 @@ let createCard = async () => {
       msg: {
         create: {
           card: {
-            name: "Crd",
-            address: "Codetredsfet",
+            name: "DElete me",
+            address: "DElete me ",
             phone: "12345678953",
           },
-          index: 0,
+          index: 1,
         },
       },
       code_hash: contractCodeHash,
@@ -115,6 +115,31 @@ let createCard = async () => {
 };
 //createCard();
 
+
+let burnContract = async () => {
+  let burn_contract = await secretjs.tx.compute.executeContract(
+    {
+      sender: wallet.address,
+      contract_address: contractAddress,
+      msg: {
+      burn:{
+       index:1
+       }
+      },
+      code_hash: contractCodeHash,
+    },
+    { gasLimit: 100_000 }
+  );
+
+  console.log(
+    burn_contract.arrayLog
+  );
+};
+
+
+//burnContract();
+
+
 let createViewingKey = async () => {
   let viewing_key_creation = await secretjs.tx.compute.executeContract(
     {
@@ -122,8 +147,8 @@ let createViewingKey = async () => {
       contract_address: contractAddress,
       msg: {
         generate_viewing_key: {
-          index: 0,
-          reciever:wallet1.address
+          index: 1,
+          reciever:wallet.address
           
         },
       },
@@ -143,17 +168,17 @@ let createViewingKey = async () => {
 
 
 
-let viewing_key="dZoik9JALs9gQX4IUydQbwCQPoojy5acjWSLKPZOItI=";
-//let viewing_key="KXHV3PcqLieJW0MMKUfn8J3pYi01YbGmrg7pmYwwdDg=";
+let viewing_key="ohpOah+D3Y2Qn/bnFAjnwnZXTPA4nDp/UAoJXryvbkA=";
+
 
 let queryCard = async () => {
 let business_card_query_tx=await secretjs.query.compute.queryContract({
 	contract_address:contractAddress,
 	query:{
 		get_card:{
-			wallet:wallet1.address,
+			wallet:wallet.address,
 			viewing_key:viewing_key,
-			index:0,
+			index:1,
 			owner:wallet.address
 		},
 		
@@ -170,7 +195,7 @@ console.log(business_card_query_tx);
 
 //Get the codeInfo based on codeid
 const codeInfo = await secretjs.query.compute.contractsByCodeId({code_id:"20622"});
-console.log(codeInfo)
+//console.log(codeInfo)
 
 // current doubts: viewing keys should be the owner to see the information, other people use the same key should not see the information ? ---- problem solve !
 

@@ -8,6 +8,10 @@ use crate::state::Card;
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
 pub struct InstantiateMsg {
     pub entropy: String,
+    pub owner: Addr,
+    pub admin:Addr,
+    pub modify: bool,
+  
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
