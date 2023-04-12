@@ -51,13 +51,13 @@ console.error(err);
 };
 
 //upload_contract();
-let contractCodeHash="bbc91b6010298e67f9f318a9c65f3a8a25863b60fb7fb5c9d11d9a72876df537";
-let codeId=20689;
-let contractAddress="secret1n5mt3u2n0vf8z4x7x6ztl0qdatyc5p8clnq9sh"
+let contractCodeHash="a0ad9e7ee9c3edb85a4d339e343410748fc50da72b23b0c8606ceb1a56d7094b";
+let codeId=20728;
+let contractAddress="secret1huqp8m4ma90kg0ptw554f0sw55zmz2ydr62jt0"
 let instantiate_contract = async () => {
   // Create an instance of the Counter contract, providing a starting count
   try{
-  console.log("initialized");
+
   const initMsg = { entropy: "this " };
   let tx = await secretjs.tx.compute.instantiateContract(
     {
@@ -65,7 +65,7 @@ let instantiate_contract = async () => {
       sender: wallet.address,
       code_hash: contractCodeHash,
       init_msg: initMsg,
-      label: "Secret BUsiness card improve Demo V3" ,
+      label: "Secret BUsiness card improve Demo V5" ,
     },
     {
       gasLimit: 400_000,
@@ -136,7 +136,6 @@ let burnContract = async () => {
   );
 };
 
-
 //burnContract();
 
 
@@ -168,7 +167,7 @@ let createViewingKey = async () => {
 
 
 
-let viewing_key="ohpOah+D3Y2Qn/bnFAjnwnZXTPA4nDp/UAoJXryvbkA=";
+let viewing_key="api_key_NUrx0MwOtSOCHka6K0QPJXQysEPSJyyAVXEmNMsiiwc=";
 
 
 let queryCard = async () => {
@@ -179,7 +178,7 @@ let business_card_query_tx=await secretjs.query.compute.queryContract({
 			wallet:wallet.address,
 			viewing_key:viewing_key,
 			index:1,
-			owner:wallet.address
+			
 		},
 		
 	
@@ -190,7 +189,7 @@ let business_card_query_tx=await secretjs.query.compute.queryContract({
 console.log(business_card_query_tx);
   
 };
-//queryCard();
+queryCard();
 
 
 //Get the codeInfo based on codeid

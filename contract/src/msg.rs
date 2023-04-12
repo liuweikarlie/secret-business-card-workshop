@@ -8,9 +8,7 @@ use crate::state::Card;
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
 pub struct InstantiateMsg {
     pub entropy: String,
-    pub owner: Addr,
-    pub admin:Addr,
-    pub modify: bool,
+
   
 }
 
@@ -20,6 +18,7 @@ pub enum ExecuteMsg {
     Create { card: Card, index: u8 },
     Burn { index: u8 },
     GenerateViewingKey { index: u8,reciever:String },
+    DeleteKey {account:String}
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug, PartialEq, Eq, JsonSchema)]
@@ -35,7 +34,7 @@ pub enum QueryMsg {
         wallet: Addr,
         viewing_key: String,
         index: u8,
-        owner:Addr
+       
     },
 }
 

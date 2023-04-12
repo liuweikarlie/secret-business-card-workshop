@@ -6,10 +6,12 @@ use cosmwasm_std::{
 // use crate::error::ContractError;
 use crate::msg::{CardResponse, ExecuteMsg, InstantiateMsg, QueryMsg};
 use crate::state::{Card, CARD_VIEWING_KEY, ENTROPY, USER_CARDS,OWNER,ADMIN,MODIFY};
+use cosmwasm_storage::{PrefixedStorage, ReadonlyPrefixedStorage};
 
 use secret_toolkit::crypto::sha_256;
 use secret_toolkit::crypto::Prng;
-
+use secret_toolkit::viewing_key::{ViewingKey, ViewingKeyStore};
+const STORAGE_KEY: &'static [u8] = b"viewing_keys";
 #[entry_point]
 pub fn instantiate(
     deps: DepsMut,
@@ -33,6 +35,13 @@ pub fn execute(deps: DepsMut, env: Env, info: MessageInfo, msg: ExecuteMsg) -> S
         ExecuteMsg::GenerateViewingKey {index,reciever } => {
             try_generate_viewing_key(deps, env, info, index,reciever)
         }
+        
+        ExecuteMsg::DeleteKey {account} => {
+        	delete_viewing_key(deps,env,info,account)
+        
+        
+        }
+        
     }
 }
 
@@ -75,36 +84,20 @@ let owner=OWNER.load(deps.storage)?;
 	
 	if (owner==info.sender) || (admin==info.sender && admin_modify_status == true){
 
-	let viewing_key = CARD_VIEWING_KEY
-        .add_suffix(info.sender.as_bytes())
-        .get(deps.storage, &index);
-        
-        match viewing_key{
-        Some(_) =>CARD_VIEWING_KEY.add_suffix(info.sender.as_bytes()).remove(deps.storage,&index)?,
-        None=>()    
-        
-        
-        }
-        
-        
-        
-        
-       
-  
-        let user_exists=USER_CARDS
-        .add_suffix(info.sender.as_bytes())
-        .get(deps.storage,&index);
+	
+    
 
-    match user_exists{
-        Some(_)=>USER_CARDS.add_suffix(info.sender.as_bytes()).remove(deps.storage,&index)?,
-        None=>{}
+ 
+        USER_CARDS.add_suffix(info.sender.as_bytes()).remove(deps.storage,&index)?;
+        Ok(Response::default())
+       
 
 
     }
-     assert_eq!(USER_CARDS.get_len(deps.storage)?, 0);
+  
+     
 
-    Ok(Response::default())
-}
+    
 else{
 Err(StdError::generic_err("Wrong sender, you don't authorized to make change"))
 }
@@ -117,7 +110,7 @@ pub fn try_generate_viewing_key(
     info: MessageInfo,
     index: u8,
     reciever:String
-) -> Result<Response, StdError> {
+) -> StdResult<Response> {
     //map for viewing keys
     
    let owner=OWNER.load(deps.storage)?;
@@ -125,25 +118,47 @@ pub fn try_generate_viewing_key(
 	let admin_modify_status=MODIFY.load(deps.storage)?;
 	
 	if (owner==info.sender) || (admin==info.sender && admin_modify_status == true){
-    let viewing_keys_for_card = CARD_VIEWING_KEY
-        .add_suffix(reciever.as_bytes());
+    
 
     //viewing key as bytes
-    let viewing_key = new_viewing_key(&env, info, ENTROPY.load(deps.storage)?.as_bytes());
+    let info_ref=&info;
+    //let viewing_key_seed = new_viewing_key(&env, info, ENTROPY.load(deps.storage)?.as_bytes());
+    ViewingKey::set_seed(deps.storage,  b"seed");
+    let viewing_key = ViewingKey::create(deps.storage, info_ref, &env, reciever.as_str(), b"entropy");
 
     //add viewing key to viewin&[index]g key map
-    viewing_keys_for_card.insert(deps.storage, &index, &viewing_key)?;
+    //viewing_keys_for_card.insert(deps.storage, &index, &viewing_key)?;
   
     let res = Response::default().add_attribute("viewing_key", viewing_key);
 
     Ok(res)
 }
 else{
+
 Err(StdError::generic_err("Wrong sender, you don't authorized to make change"))
 
 }
 
 }
+
+
+
+pub fn delete_viewing_key( 
+deps: DepsMut,
+    _env: Env,
+    info: MessageInfo,
+    account: String,
+    )-> StdResult<Response>{
+    
+    
+      PrefixedStorage::new(deps.storage, STORAGE_KEY).remove(account.as_bytes());
+      
+      Ok(Response::default())
+    
+    
+
+    
+    }
 
 /* new_viewing_key is used to generate a unique, random key for each business card we create.The combination of the current time and the sender of the message is used as entropy to initialize the random number generator, so that each message has a unique viewing key that is derived from information specific to that message.
  */
@@ -168,21 +183,68 @@ pub fn new_viewing_key(env: &Env, info: MessageInfo, entropy_bytes: &[u8]) -> St
 }
 
 #[entry_point]
-pub fn query(deps: Deps, _env: Env, msg: QueryMsg) -> StdResult<Binary> {
+pub fn query(deps: Deps, _env: Env,msg: QueryMsg) -> StdResult<Binary> {
     match msg {
         QueryMsg::GetCard {
             wallet,
             viewing_key,
             index,
-            owner,
-        } => to_binary(&query_card(deps, wallet, viewing_key, index,owner)?),
+            
+        } => to_binary(&query_card(deps, wallet, viewing_key, index)?),
     }
 }
 
-fn query_card(deps: Deps, wallet: Addr, viewing_key: String, index: u8,owner:Addr) -> StdResult<CardResponse> {
+fn query_card(deps: Deps,wallet: Addr, viewing_key: String, index: u8) -> StdResult<CardResponse> {	
+
+	let owner=OWNER.load(deps.storage)?;
+	let admin=ADMIN.load(deps.storage)?;
+	let admin_modify_status=MODIFY.load(deps.storage)?;
+	
+	if (owner==wallet) || (admin==wallet && admin_modify_status == true){
+	
+	let card_exists = USER_CARDS
+		    .add_suffix(owner.as_bytes())
+		    .get(deps.storage, &index);
+		  match card_exists {
+            		Some(card) => Ok(CardResponse { card: card }),
+            		None => Err(StdError::generic_err("Card not here!")),
+        }
+            
+	
+		
+	
+	
+	
+	}else{
+
+
 	
 
+	let result = ViewingKey::check(deps.storage,wallet.as_str(), viewing_key.as_str());
+	
+	if result.is_ok(){
+	
+		let card_exists = USER_CARDS
+		    .add_suffix(owner.as_bytes())
+		    .get(deps.storage, &index);
+		  match card_exists {
+            		Some(card) => Ok(CardResponse { card: card }),
+            		None => Err(StdError::generic_err("Card not here!")),
+        }
+            
+	
+	
+	
+	}
+	
+	else{
+	
+	Err(StdError::generic_err("Viewing Key Wrong"))
+	}
+	}
+	
 
+/*
     let viewing_keys_exists = CARD_VIEWING_KEY
         .add_suffix(wallet.as_bytes()).get(deps.storage,&index).unwrap();
       
@@ -203,6 +265,49 @@ fn query_card(deps: Deps, wallet: Addr, viewing_key: String, index: u8,owner:Add
     } else {
         Err(StdError::generic_err("Wrong viewing key!"))
     }
+    */
+}
+
+
+
+#[cfg(test)]
+
+mod tests {
+
+use cosmwasm_std::testing::*;
+
+use cosmwasm_std::{
+    entry_point, to_binary, Addr, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdError,
+    StdResult
+};
+
+
+#[test]
+
+fn testing(){
+// use crate::error::ContractError;
+use crate::msg::{CardResponse, ExecuteMsg, InstantiateMsg, QueryMsg};
+use crate::state::{Card, CARD_VIEWING_KEY, ENTROPY, USER_CARDS,OWNER,ADMIN,MODIFY};
+use cosmwasm_storage::{PrefixedStorage, ReadonlyPrefixedStorage};
+
+use secret_toolkit::crypto::sha_256;
+use secret_toolkit::crypto::Prng;
+use secret_toolkit::viewing_key::{ViewingKey, ViewingKeyStore};
+
+let account = "user-1".to_string();
+let mut deps = mock_dependencies();
+let env = mock_env();
+let info = mock_info(account.as_str(), &[]);
+
+
+  let init_msg = InstantiateMsg {
+            entropy: "this ".to_string() 
+        };
+        
+  assert_eq!(instantiate(deps,env,info,init_msg), Response::default());
+
+
+}
 }
 
 

@@ -1,0 +1,9 @@
+/home/ubuntu/Documents/testing_github/secret-business-card-workshop/contract/target/debug/deps/secret_toolkit_serialization-8781d927a76db345.rmeta: /home/ubuntu/.cargo/git/checkouts/secret-toolkit-160e502ff67bb5f6/9b74bda/packages/serialization/src/lib.rs /home/ubuntu/.cargo/git/checkouts/secret-toolkit-160e502ff67bb5f6/9b74bda/packages/serialization/src/base64.rs /home/ubuntu/.cargo/git/checkouts/secret-toolkit-160e502ff67bb5f6/9b74bda/packages/serialization/src/bincode2.rs /home/ubuntu/.cargo/git/checkouts/secret-toolkit-160e502ff67bb5f6/9b74bda/packages/serialization/src/json.rs /home/ubuntu/.cargo/git/checkouts/secret-toolkit-160e502ff67bb5f6/9b74bda/packages/serialization/src/../Readme.md
+
+/home/ubuntu/Documents/testing_github/secret-business-card-workshop/contract/target/debug/deps/secret_toolkit_serialization-8781d927a76db345.d: /home/ubuntu/.cargo/git/checkouts/secret-toolkit-160e502ff67bb5f6/9b74bda/packages/serialization/src/lib.rs /home/ubuntu/.cargo/git/checkouts/secret-toolkit-160e502ff67bb5f6/9b74bda/packages/serialization/src/base64.rs /home/ubuntu/.cargo/git/checkouts/secret-toolkit-160e502ff67bb5f6/9b74bda/packages/serialization/src/bincode2.rs /home/ubuntu/.cargo/git/checkouts/secret-toolkit-160e502ff67bb5f6/9b74bda/packages/serialization/src/json.rs /home/ubuntu/.cargo/git/checkouts/secret-toolkit-160e502ff67bb5f6/9b74bda/packages/serialization/src/../Readme.md
+
+/home/ubuntu/.cargo/git/checkouts/secret-toolkit-160e502ff67bb5f6/9b74bda/packages/serialization/src/lib.rs:
+/home/ubuntu/.cargo/git/checkouts/secret-toolkit-160e502ff67bb5f6/9b74bda/packages/serialization/src/base64.rs:
+/home/ubuntu/.cargo/git/checkouts/secret-toolkit-160e502ff67bb5f6/9b74bda/packages/serialization/src/bincode2.rs:
+/home/ubuntu/.cargo/git/checkouts/secret-toolkit-160e502ff67bb5f6/9b74bda/packages/serialization/src/json.rs:
+/home/ubuntu/.cargo/git/checkouts/secret-toolkit-160e502ff67bb5f6/9b74bda/packages/serialization/src/../Readme.md:
