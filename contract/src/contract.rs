@@ -120,14 +120,13 @@ pub fn try_generate_viewing_key(
 	if (owner==info.sender) || (admin==info.sender && admin_modify_status == true){
     
 
-    //viewing key as bytes
+    
     let info_ref=&info;
-    //let viewing_key_seed = new_viewing_key(&env, info, ENTROPY.load(deps.storage)?.as_bytes());
+   
     ViewingKey::set_seed(deps.storage,  b"seed");
     let viewing_key = ViewingKey::create(deps.storage, info_ref, &env, reciever.as_str(), b"entropy");
 
-    //add viewing key to viewin&[index]g key map
-    //viewing_keys_for_card.insert(deps.storage, &index, &viewing_key)?;
+    
   
     let res = Response::default().add_attribute("viewing_key", viewing_key);
 
@@ -151,7 +150,8 @@ deps: DepsMut,
     )-> StdResult<Response>{
     
     
-      PrefixedStorage::new(deps.storage, STORAGE_KEY).remove(account.as_bytes());
+      //PrefixedStorage::new(deps.storage, STORAGE_KEY).remove(account.as_bytes());
+      deps.storage.remove(account.as_bytes());
       
       Ok(Response::default())
     
@@ -278,21 +278,24 @@ use cosmwasm_std::testing::*;
 
 use cosmwasm_std::{
     entry_point, to_binary, Addr, Binary, Deps, DepsMut, Env, MessageInfo, Response, StdError,
-    StdResult
+    StdResult,Storage,ReadonlyStorage
 };
 
 
-#[test]
-
-fn testing(){
 // use crate::error::ContractError;
 use crate::msg::{CardResponse, ExecuteMsg, InstantiateMsg, QueryMsg};
 use crate::state::{Card, CARD_VIEWING_KEY, ENTROPY, USER_CARDS,OWNER,ADMIN,MODIFY};
 use cosmwasm_storage::{PrefixedStorage, ReadonlyPrefixedStorage};
+use cosmwasm_std::traits::{ReadonlyStorageMap, IterableStorageMap};
 
 use secret_toolkit::crypto::sha_256;
 use secret_toolkit::crypto::Prng;
 use secret_toolkit::viewing_key::{ViewingKey, ViewingKeyStore};
+
+   use super::*;
+
+#[test]
+fn testing(){
 
 let account = "user-1".to_string();
 let mut deps = mock_dependencies();
@@ -303,10 +306,67 @@ let info = mock_info(account.as_str(), &[]);
   let init_msg = InstantiateMsg {
             entropy: "this ".to_string() 
         };
-        
-  assert_eq!(instantiate(deps,env,info,init_msg), Response::default());
+       let result= instantiate(deps.as_mut(),env,info,init_msg);
+  assert_eq!(result, Ok(Response::default()));
+  
+  
+  
+  /*
+  let Card={
+  	name: "DElete me",
+            address: "DElete me ",
+            phone: "12345678953",
+  };*/
+  
+  
+  // create table 
+  let mesg = ExecuteMsg :: Create { card: Card{
+  	name: "DElete me".to_string(),
+            address: "DElete me ".to_string(),
+            phone: "12345678953".to_string(),
+  }, index: 0 };
+   
 
+	
+	
+	let result1=execute(deps.as_mut(),mock_env(),mock_info(account.as_str(), &[]),mesg);
+	
+	assert_eq!(result1, Ok(Response::default()));
+	
+	
+	//generate key
+	let mesg1=ExecuteMsg :: GenerateViewingKey { index: 0,reciever:"user-2".to_string() };
+	
+	let result2=execute(deps.as_mut(),mock_env(),mock_info(account.as_str(), &[]),mesg1);
+	
+	assert_eq!(result2, Ok(Response::default()));
+	
+	
+	 
+	//check delete viewing key function ---- success !
+		let mesg2=ExecuteMsg :: DeleteKey { account:"user-2".to_string() };
+	//let result3=execute(deps.as_mut(),mock_env(),mock_info(account.as_str(), &[]),mesg2);
+	
+	//assert_eq!(result3, Ok(Response::default()));
 
+	
+	
+	/*
+	match r{
+	Some(v) => a=1,
+	None =>a=0,
+	
+	}*/
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 }
 }
 

@@ -1,5 +1,6 @@
 import { MsgExecuteContract } from "secretjs";
 
+
 export default function CreateCard({
   card,
   setCard,
@@ -8,30 +9,101 @@ export default function CreateCard({
   secretJs,
   myAddress,
 }) {
-  let contractAddress = "";
-  let contractCodeHash = "";
+
+  
+  const codeId=20729;
+  const contractCodeHash="8577aab4926b9a0fcb264c783ef25be728e0c0eba1811893569a8eb2421269a4";
 
   let formSubmitted = (e) => {
     e.preventDefault();
-    createCard(
-      e.target.elements.name.value,
-      e.target.elements.address.value,
-      e.target.elements.phone.value,
-      e.target.elements.cardNumber.value
-    );
-
-    setCard({
+     setCard({
       name: e.target.elements.name.value,
       address: e.target.elements.address.value,
       number: e.target.elements.phone.value,
       index: parseInt(e.target.elements.cardNumber.value),
     });
+    createCard(
+      e.target.elements.name.value,
+      e.target.elements.address.value,
+      e.target.elements.phone.value,
+      parseInt(e.target.elements.cardNumber.value)
+    );
+
+   
   };
 
   let createCard = async (name, address, phone, index) => {
     // your code to go here
+    try{
+    
+    const init_msg = { entropy: "this " };
+    let label="Secret BUsiness card improve Demo V9";
+    
+    
+    // initiate contract
+    
+    /*
+   let tx = await secretJs.tx.compute.instantiateContract(
+    {
+      code_id: codeId,
+      sender: myAddress,
+      code_hash: contractCodeHash,
+      init_msg: init_msg,
+      label: "Secret BUsiness card improve Demo V8 "+ Math.ceil(Math.random() * 10000) ,
+    },
+    {
+      gasLimit: 400_000,
+    }
+  );
+  
+  let a = tx.arrayLog;
+  let contractAddress=a.find(
+    (log) => log.type === "message" && log.key === "contract_address"
+  ).value;
+  console.log(contractAddress);
+
+  //Find the contract_address in the logs
+  
+  
+  
+    if (contractAddress.length >0){*/
+    
+     //execute create card
+     const contractAddress="secret1vjd6sahlrf87eykmsg27u83t8rm8s4ew3wjh90";
+     console.log(card['number']);
+    	 const card_creation_tx = await secretJs.tx.compute.executeContract(
+    {
+      sender: myAddress,
+      contract_address: contractAddress,
+      msg: {
+        create: {
+          card: {
+            name: card['name'],
+            address: card['address'],
+            phone: card['phone'],
+          },
+          index: card['number'],
+        },
+      },
+      code_hash: contractCodeHash,
+    },
+    { gasLimit: 100_000 }
+  );
+  
+
+  
+    
+
+  }
+  
+  catch(err){
+  
+  console.error(err);
+  
+  }
+  
   };
-  // createCard();
+createCard();
 
   return (
     <>

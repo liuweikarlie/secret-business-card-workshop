@@ -51,9 +51,13 @@ console.error(err);
 };
 
 //upload_contract();
-let contractCodeHash="a0ad9e7ee9c3edb85a4d339e343410748fc50da72b23b0c8606ceb1a56d7094b";
-let codeId=20728;
-let contractAddress="secret1huqp8m4ma90kg0ptw554f0sw55zmz2ydr62jt0"
+
+let contractCodeHash="8577aab4926b9a0fcb264c783ef25be728e0c0eba1811893569a8eb2421269a4";
+let codeId=20729;
+let contractAddress="secret19ttj98gk3ylmdg5gzrlt38rdtgslgyhrrxqcg4"
+
+
+
 let instantiate_contract = async () => {
   // Create an instance of the Counter contract, providing a starting count
   try{
@@ -65,7 +69,7 @@ let instantiate_contract = async () => {
       sender: wallet.address,
       code_hash: contractCodeHash,
       init_msg: initMsg,
-      label: "Secret BUsiness card improve Demo V5" ,
+      label: "Secret BUsiness card improve Demo V6" +Math.ceil(Math.random() * 10000),
     },
     {
       gasLimit: 400_000,
@@ -140,13 +144,15 @@ let burnContract = async () => {
 
 
 let createViewingKey = async () => {
+console.log(wallet2.address)
+
   let viewing_key_creation = await secretjs.tx.compute.executeContract(
     {
       sender: wallet.address,
       contract_address: contractAddress,
       msg: {
         generate_viewing_key: {
-          index: 1,
+          index: 423,
           reciever:wallet.address
           
         },
@@ -160,14 +166,37 @@ let createViewingKey = async () => {
     viewing_key_creation.arrayLog
   );
 };
+createViewingKey();
+
+let deleteViewingKey =async () => {
+  let viewing_key_delete = await secretjs.tx.compute.executeContract(
+    {
+      sender: wallet.address,
+      contract_address: contractAddress,
+      msg: {
+        delete_key: {
+         
+          account:wallet1.address
+          
+        },
+      },
+      code_hash: contractCodeHash,
+    },
+    { gasLimit: 100_000 }
+  );
+
+  console.log(
+    viewing_key_delete.arrayLog
+  );
+};
 
 
-//createViewingKey();
+//deleteViewingKey();
 
 
 
 
-let viewing_key="api_key_NUrx0MwOtSOCHka6K0QPJXQysEPSJyyAVXEmNMsiiwc=";
+let viewing_key="api_key_Uj0SCTkceMG+hoTVq8XkAoLZajaRdTf9t6q2/FmNRO4=";
 
 
 let queryCard = async () => {
@@ -175,7 +204,7 @@ let business_card_query_tx=await secretjs.query.compute.queryContract({
 	contract_address:contractAddress,
 	query:{
 		get_card:{
-			wallet:wallet.address,
+			wallet:wallet1.address,
 			viewing_key:viewing_key,
 			index:1,
 			
@@ -186,10 +215,31 @@ let business_card_query_tx=await secretjs.query.compute.queryContract({
 	code_hash:contractCodeHash,
 	
 });
-console.log(business_card_query_tx);
+console.log(business_card_query_tx.card);
   
 };
-queryCard();
+//queryCard();
+
+
+let bankTransfer = async () => {
+let bank_tx = await secretjs.tx.bank.send(
+    {
+      amount: [{ amount: "1000", denom: "uscrt" }],
+      from_address: wallet.address,
+      to_address: wallet1.address, // Set recipient to sender for testing
+    },
+    {
+      gasLimit: 20_000,
+      gasPriceInFeeDenom: 0.25,
+      memo: "send tokens ",
+    }
+  );
+
+  console.log("Transaction: ", bank_tx);
+};
+
+//bankTransfer();
+
 
 
 //Get the codeInfo based on codeid
